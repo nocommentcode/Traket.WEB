@@ -53,6 +53,7 @@ namespace Spendings.WEB.Services
             }
         }
 
+
         public async Task<LoginResultVm> RefreshToken(string token, string refreshToken)
         {
             var url = $"{_config.GetValue<string>("Api:Url")}/api/token/refresh";
