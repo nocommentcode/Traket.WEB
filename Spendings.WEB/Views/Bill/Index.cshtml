@@ -1,0 +1,312 @@
+﻿@model List<Spendings.WEB.Models.Bill>
+@{
+    ViewData["Title"] = "Bills";
+}
+
+<div class="row">
+
+    <div class="col-12 col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="h3 mb-3">Bills</h1>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" id="create-bill-btn" data-target="#bill-create-modal">Create </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div id="bill-error-message" class="alert alert-danger alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <div class="alert-message" id="bill-error-message-field">
+                </div>
+            </div>
+            <table id="bill-table" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width:30%;">Billing Start</th>
+                        <th style="width:30%;">Billing End</th>
+                        <th style="width:30%">Amount</th>
+                        <th style="width:30%">Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var bill in Model)
+                    {
+                        <tr id="bill-@bill.Id">
+                            <td>@bill.BillingStart.ToString("dd-MM-yy")</td>
+                            <td>@(bill.BillingEnd.HasValue ? bill.BillingEnd.Value.ToString("dd-MM-yy") : "Ongoing")</td>
+                            <td>$@decimal.Round(bill.Amount,2)</td>
+                            <td>@bill.Name</td>
+                            <td class="table-action">
+                                <a onclick="openEditbillModal('@bill.Id', '@decimal.Round(bill.Amount,2)', '@bill.BillingStart.ToString("yyyy-MM-ddTHH:mm")', '@(bill.BillingEnd.HasValue? bill.BillingEnd.Value.ToString("yyyy-MM-ddTHH:mm") : "")', '@bill.Name', '@bill.DayOfMonthDebited')"><i class="align-middle" data-feather="edit-2"></i></a>
+                                <a onClick="deletebill('@bill.Id')"><i class="align-middle" data-feather="trash"></i></a>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="bill-edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit bill</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body m-3">
+                <form>
+                    <input id="modal-bill-edit-id" type="hidden">
+                    <div class="form-group">
+                        <label class="form-label">Billing Start</label>
+                        <input id="modal-bill-edit-start-date" class="form-control" type="datetime-local">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="form-label">Billing End</label>
+                        <input type="checkbox" id="bill-edit-billing-ongoing" name="edit-billing-ongoing" value="true">
+                        <label for="bill-edit-billing-ongoing"> Billing ongoing?</label>
+                        <br />
+                        <input id="modal-bill-edit-end-date" class="form-control" type="datetime-local">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Amount</label>
+                        <input id="modal-bill-edit-amount" class="form-control" type="number">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Day Of Month Debited</label>
+                        <input id="modal-bill-edit-dayOfMonth" class="form-control" type="number">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input id="modal-bill-edit-name" class="form-control" type="text">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button id="modal-edit-save-changes" type="button" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="bill-create-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create bill</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body m-3">
+                <form>
+                    <div class="form-group">
+                        <label class="form-label">Billing Start</label>
+                        <input id="modal-bill-create-start-date" class="form-control" type="datetime-local">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Billing End</label>
+                        <input type="checkbox" id="bill-create-billing-ongoing" name="create-billing-ongoing" value="true">
+                        <label for="bill-create-billing-ongoing"> Billing ongoing?</label>
+                        <br />
+                        <input id="modal-bill-create-end-date" class="form-control" type="datetime-local">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Amount</label>
+                        <input id="modal-bill-create-amount" class="form-control" type="number">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Day Of Month Debited</label>
+                        <input id="modal-bill-create-dayOfMonth" class="form-control" type="number">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input id="modal-bill-create-name" class="form-control" type="text">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button id="modal-create-save-changes" type="button" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            $('#bill-tab').addClass("active");
+
+            $('#bill-error-message-field').hide();
+
+        });
+
+       
+        $('#modal-edit-save-changes').click(function () {
+
+            var name = $('#modal-bill-edit-name').val();
+            var amount = $('#modal-bill-edit-amount').val();
+            var startDate = new Date($('#modal-bill-edit-start-date').val());
+            var endDate = new Date($('#modal-bill-edit-end-date').val());
+            var isOngoing = $('#bill-edit-billing-ongoing').prop('checked');
+            var id = $('#modal-bill-edit-id').val();
+            var dayOfMonth = $('#modal-bill-edit-dayOfMonth').val();
+
+            var bill = {
+                name: name,
+                id: id,
+                amount: amount,
+                billingStart: startDate.toISOString(),
+                dayOfMonthDebited: dayOfMonth
+            };
+
+            if (!isOngoing) {
+                bill.billingEnd = endDate.toISOString()
+            };
+
+            console.log(bill);
+
+            $.post("/update-bill-ajax", bill, function (result) {
+                if (result.isSuccessStatusCode) {
+                    var childeren = $("#bill-" + id).children();
+                    var day = ("0" + date.getDate()).slice(-2);
+                    var month = ("0" + (date.getMonth() + 1)).slice(-2);
+                    childeren[0].innerHTML = day + '-' + month + '-' + date.getFullYear().toString().substring(2);
+                    childeren[1].innerHTML = '$' + amount.toString();
+                    childeren[2].innerHTML = employer;
+                }
+                else {
+                    console.log(result);
+                    displayError("Could not update bill " + id + " because an error occured ( " + result.reasonPhrase + " )");
+                }
+            });
+
+            $('#bill-edit-modal').modal('hide');
+
+        });
+
+        $('#create-bill-btn').click(function () {
+
+            var date = new Date();
+            var day = ("0" + date.getDate()).slice(-2);
+            var month = ("0" + (date.getMonth() + 1)).slice(-2);
+            var hour = ("0" + (date.getHours())).slice(-2);
+            var minute = ("0" + (date.getMinutes())).slice(-2);
+            var dateString = date.getFullYear() + "-" + month + "-" + day + "T" + hour + ":" + minute
+            console.log(dateString);
+            $('#modal-bill-create-start-date').val(dateString);
+            $('#bill-create-billing-ongoing').prop('checked', true);
+            $('#modal-bill-create-end-date').hide();
+
+            $('#bill-create-billing-ongoing').click(function () {
+                if ($(this).prop('checked')) {
+                    $('#modal-bill-create-end-date').hide();
+
+                } else {
+                    $('#modal-bill-create-end-date').show();
+                }
+            });
+
+        });
+
+        $('#modal-create-save-changes').click(function () {
+            var name = $('#modal-bill-create-name').val();
+            var amount = $('#modal-bill-create-amount').val();
+            var startDate = new Date($('#modal-bill-create-start-date').val());
+            var endDate = new Date($('#modal-bill-create-end-date').val());
+            var isOngoing = $('#bill-create-billing-ongoing').prop('checked');
+            var dayOfMonth = $('#modal-bill-create-dayOfMonth').val();
+
+            var bill = {
+                name: name,
+                amount: amount,
+                billingStart: startDate.toISOString(),
+                dayOfMonthDebited: dayOfMonth
+            };
+
+            if (!isOngoing) {
+                bill.billingEnd = endDate.toISOString()
+            };
+
+            console.log(bill);
+
+            $.post("/create-bill-ajax", bill, function (result) {
+                    if (result.isSuccessStatusCode) {
+                        $('#bill-create-modal').modal('hide');
+                        location.reload();
+                    }
+                    else {
+                        displayError("Could not create bill " + id + " because an error occured ( " + result.reasonPhrase + " )");
+                    }
+                });
+            });
+
+
+        function openEditbillModal(id, amount, startDate, endDate, name, dayOfMonth) {
+            $('#modal-bill-edit-id').val(id);
+            $('#modal-bill-edit-amount').val(amount);
+            $('#modal-bill-edit-name').val(name);
+            $('#modal-bill-edit-start-date').val(startDate);
+            $('#modal-bill-edit-dayOfMonth').val(dayOfMonth);
+
+            if (endDate == '') {
+                $('#bill-edit-billing-ongoing').prop('checked', true);
+                $('#modal-bill-edit-end-date').hide();
+            } else {
+                $('#bill-edit-billing-ongoing').prop('checked', false);
+                $('#modal-bill-edit-end-date').val(endDate);
+                $('#modal-bill-edit-end-date').show();
+            }
+            $('#bill-edit-billing-ongoing').click(function () {
+                if ($(this).prop('checked')) {
+                    $('#modal-bill-edit-end-date').hide();
+
+                } else {
+                    $('#modal-bill-edit-end-date').show();
+                }
+            });
+
+            $('#bill-edit-modal').modal('show');
+
+        }
+
+        function deletebill(id) {
+            $.post("/delete-bill-ajax?id=" + id, function (result) {
+                console.log(result);
+                if (result.isSuccessStatusCode) {
+                    $("#bill-" + id).remove();
+                }
+                else {
+                    displayError("Could not delete bill " + id + " because an error occured ( " + result.reasonPhrase + " )");
+                }
+            });
+        }
+
+        function displayError(message) {
+            $('#bill-error-message-field').innerHTML = message;
+            $('#bill-error-message-field').text(message);
+            $('#bill-error-message-field').show();
+        }
+
+    </script>
+}

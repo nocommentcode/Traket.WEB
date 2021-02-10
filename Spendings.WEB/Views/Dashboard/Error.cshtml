@@ -1,0 +1,19 @@
+﻿@model string
+@{
+    ViewData["Title"] = "Home Page";
+    byte[] firstNamebytes = null;
+    byte[] lastNameBytes = null;
+    string token = "";
+    string validtill = "";
+    var isLoggedIn = Context.Session.TryGetValue("access_token", out firstNamebytes) && Context.Session.TryGetValue("valid_till", out lastNameBytes);
+    if (isLoggedIn) {
+        token = System.Text.Encoding.UTF8.GetString(firstNamebytes);
+        validtill = System.Text.Encoding.UTF8.GetString(lastNameBytes);
+    }
+}
+<div>
+    token = @token <br />
+valid till = @validtill
+
+    error refreshing - @Model
+    </div>

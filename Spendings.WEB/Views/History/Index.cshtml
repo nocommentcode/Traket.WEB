@@ -1,0 +1,117 @@
+﻿@model Spendings.WEB.Models.HistoryVm
+@using Newtonsoft.Json
+@{
+    if(Model.Months.Count == 0)
+    {
+        return;
+    }
+    ViewData["Title"] = "History";
+
+    var labels = new List<string>();
+    var expenses = new List<decimal>();
+    var income = new List<decimal>();
+    var bills = new List<decimal>();
+
+    foreach(var month in Model.Months)
+    {
+        labels.Add($"{month.Month}/{month.Year}");
+        expenses.Add(month.TotalExpenses);
+        income.Add(month.TotalIncome);
+        bills.Add(month.TotalBills);
+    }
+
+    var labelsJson = JsonConvert.SerializeObject(labels);
+    var expensesJson = JsonConvert.SerializeObject(expenses);
+    var incomeJson = JsonConvert.SerializeObject(income);
+    var billsJson = JsonConvert.SerializeObject(bills);
+
+}
+
+<div class="row">
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">History</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart">
+                    <canvas id="chartjs-bar"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+
+        $(document).ready(function () {
+            $('#history-tab').addClass("active");
+        });
+
+        $(function () {
+            // Bar chart
+            new Chart(document.getElementById("chartjs-bar"), {
+                type: "bar",
+                data: {
+                    labels: JSON.parse('@Html.Raw(labelsJson)'),
+                    datasets: [{
+                        label: "Expenses",
+                        backgroundColor: window.theme.primary,
+                        borderColor: window.theme.primary,
+                        hoverBackgroundColor: window.theme.primary,
+                        hoverBorderColor: window.theme.primary,
+                        data: JSON.parse('@Html.Raw(expensesJson)'),
+                        barPercentage: .75,
+                        categoryPercentage: .5,
+                        stack:1
+                    },
+                        {
+                        label: "Bills",
+                        backgroundColor: "#ab0728",
+                        borderColor: "#ab0728",
+                        hoverBackgroundColor: "#ab0728",
+                        hoverBorderColor: "#ab0728",
+                        data: JSON.parse('@Html.Raw(billsJson)'),
+                        barPercentage: .75,
+                        categoryPercentage: .5,
+                        stack:1
+                    }, {
+                        label: "Income",
+                        backgroundColor: "#dee2e6",
+                        borderColor: "#dee2e6",
+                        hoverBackgroundColor: "#dee2e6",
+                        hoverBorderColor: "#dee2e6",
+                        data: JSON.parse('@Html.Raw(incomeJson)'),
+                        barPercentage: .75,
+                            categoryPercentage: .5,
+                        stack:2
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    legend: {
+                        display: false
+                    },
+                    scales: {
+                        yAxes: [{
+                            gridLines: {
+                                display: false
+                            },
+                            stacked: true,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }],
+                        xAxes: [{
+                            stacked: true,
+                            gridLines: {
+                                color: "transparent"
+                            }
+                        }]
+                    }
+                }
+            });
+        });
+    </script>
+}

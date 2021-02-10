@@ -1,0 +1,298 @@
+﻿@model Spendings.WEB.Models.ExpenseVm
+@{
+    ViewData["Title"] = "Expenses";
+}
+
+<div class="row">
+
+    <div class="col-12 col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="h3 mb-3">Expenses</h1>
+               
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <button type="button" class="btn btn-primary" id="monthly-expenses-btn" >Monthly</button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-primary" id="yearly-expenses-btn">Yearly</button>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" id="create-expense-btn" data-target="#expense-create-modal">Create </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div id="expense-error-message" class="alert alert-danger alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <div class="alert-message" id="expense-error-message-field">
+                </div>
+            </div>
+            <table id="expense-table" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width:30%;">Date</th>
+                        <th style="width:30%">Amount</th>
+                        <th style="width:30%">Category</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var expense in Model.Expenses)
+                    {
+                        <tr id="expense-@expense.Id">
+                            <td>@expense.Date.ToString("dd-MM-yy")</td>
+                            <td>$@decimal.Round(expense.Amount,2)</td>
+                            <td>@expense.CategoryName</td>
+                            <td class="table-action">
+                                <a onclick="openEditExpenseModal('@expense.Id', '@decimal.Round(expense.Amount,2)', '@expense.Date.ToString("yyyy-MM-ddTHH:mm")','@expense.CategoryId')"><i class="align-middle" data-feather="edit-2"></i></a>
+                                <a onClick="deleteExpense('@expense.Id')"><i class="align-middle" data-feather="trash"></i></a>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="expense-edit-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Expense</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body m-3">
+                <form>
+                    <input id="modal-expense-edit-id" type="hidden">
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input id="modal-expense-edit-date" class="form-control" type="datetime-local">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Amount</label>
+                        <input id="modal-expense-edit-amount" class="form-control" type="number">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select id="modal-expense-edit-category" class="custom-select mb-3">
+                          @{ foreach (var category in Model.Categories)
+                              {
+                                  <option data-value="@category.Id">@category.Name</option>
+                              }
+                          }
+                        </select>                    
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button id="modal-edit-save-changes" type="button" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="expense-create-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Expense</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body m-3">
+                <form>
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input id="modal-expense-create-date" class="form-control" type="datetime-local">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Amount</label>
+                        <input id="modal-expense-create-amount" class="form-control" type="number">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select id="modal-expense-create-category" class="custom-select mb-3">
+                            @{ foreach (var category in Model.Categories)
+                                {
+                                    <option data-value="@category.Id">@category.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button id="modal-create-save-changes" type="button" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            $('#expense-tab').addClass("active");
+
+            $('#expense-error-message-field').hide();
+
+            if ('@Model.isCreateScreen' === 'True') {
+                $('#create-expense-btn').click();
+                console.log('ho')
+            }
+
+        });
+
+        $('#yearly-expenses-btn').click(function () {
+            var d = new Date();
+            d.setMonth(0);
+            d.setDate(1);
+            d.setHours(0);
+            d.setMinutes(0);
+            d.setSeconds(0);
+            d.setMilliseconds(0);
+
+            window.location.href = '/Expense?startDate=' + d.toISOString();
+        });
+
+        $('#monthly-expenses-btn').click(function () {
+            var d = new Date();
+            d.setDate(1);
+            d.setHours(0);
+            d.setMinutes(0);
+            d.setSeconds(0);
+            d.setMilliseconds(0);
+
+            window.location.href = '/Expense?startDate=' + d.toISOString();
+        });
+
+        $('#modal-edit-save-changes').click(function () {
+
+            var categoryId = $('#modal-expense-edit-category').find(":selected").data("value");
+            var categoryName = $('#modal-expense-edit-category').find(":selected").val();
+            var amount = $('#modal-expense-edit-amount').val();
+            var date = new Date($('#modal-expense-edit-date').val());
+            var id = $('#modal-expense-edit-id').val();
+
+            var expense = {
+                categoryId: categoryId,
+                id: id,
+                amount: amount,
+                date: date.toISOString()
+            };
+
+            console.log(expense);
+
+            $.post("/update-expense-ajax", expense, function (result) {
+                if (result.isSuccessStatusCode) {
+                    var childeren = $("#expense-" + id).children();
+                    var day = ("0" + date.getDate()).slice(-2);
+                    var month = ("0" + (date.getMonth() + 1)).slice(-2);
+                    childeren[0].innerHTML = day + '-' + month + '-' + date.getFullYear().toString().substring(2);
+                    childeren[1].innerHTML = '$' + amount.toString();
+                    childeren[2].innerHTML = categoryName;
+                }
+                else {
+                    console.log(result);
+                    displayError("Could not update Expense " + id + " because an error occured ( " + result.reasonPhrase + " )");
+                    $('#expense-edit-modal').modal('hide');
+
+                }
+            });
+
+            $('#expense-edit-modal').modal('hide');
+
+        });
+
+        $('#create-expense-btn').click(function () {
+
+            var date = new Date();
+            var day = ("0" + date.getDate()).slice(-2);
+            var month = ("0" + (date.getMonth() + 1)).slice(-2);
+            var hour = ("0" + (date.getHours())).slice(-2);
+            var minute = ("0" + (date.getMinutes())).slice(-2);
+            var dateString = date.getFullYear() + "-" + month + "-" + day + "T" + hour + ":" + minute
+            console.log(dateString);
+            $('#modal-expense-create-date').val(dateString);
+
+        });
+
+        $('#modal-create-save-changes').click(function () {
+            var categoryId = $('#modal-expense-create-category').find(":selected").data("value");
+            var amount = $('#modal-expense-create-amount').val();
+            var date = new Date($('#modal-expense-create-date').val());
+
+            var expense = {
+                categoryId: categoryId,
+                amount: amount,
+                date: date.toISOString()
+            };
+
+            console.log(expense);
+            $.post("/create-expense-ajax", expense, function (result) {
+                    if (result.isSuccessStatusCode) {
+                        //$('#category-table tr:last').after("<tr id=\"category-" + result.content.Id +"\"><td>" + result.content.Name + "</td><td>$0.00</td><td class=\"table-action\"><a onclick=\"openEditCatModal('" + result.content.Id + "', '" + result.content.Name + "')\"><i class=\"align-middle\" data-feather=\"edit-2\"></i></a><a onClick=\"deleteCategory('" + result.content.Id+"')\"><i class=\"align-middle\" data-feather=\"trash\"></i></a></td></tr>");
+                        $('#expense-create-modal').modal('hide');
+                        location.reload();
+                    }
+                    else {
+                        displayError("Could not create Expense because an error occured ( " + result.reasonPhrase + " )");
+                        $('#expense-create-modal').modal('hide');
+                        console.log(result.details);
+
+                    }
+                });
+            });
+
+
+        function openEditExpenseModal(id, amount, date, category) {
+            $('#modal-expense-edit-id').val(id);
+            $('#modal-expense-edit-amount').val(amount);
+            console.log(date);
+            $('#modal-expense-edit-date').val(date);
+
+            $("#modal-expense-edit-category option[data-value='" + category+ "']").attr("selected", "selected");
+
+            $('#expense-edit-modal').modal('show');
+
+        }
+
+        function deleteExpense(id) {
+            $.post("/delete-expense-ajax?id=" + id, function (result) {
+                console.log(result);
+                if (result.isSuccessStatusCode) {
+                    $("#expense-" + id).remove();
+                }
+                else {
+                    displayError("Could not delete Expense " + id + " because an error occured ( " + result.reasonPhrase + " )");
+                    console.log(result.details);
+                } 
+            });
+        }
+
+        function displayError(message) {
+            $('#expense-error-message-field').innerHTML = message;
+            $('#expense-error-message-field').text(message);
+            $('#expense-error-message-field').show();
+        }
+
+    </script>
+}
