@@ -20,6 +20,9 @@
                                 <button type="button" class="btn btn-primary" id="yearly-expenses-btn">Yearly</button>
                             </td>
                             <td>
+                                <button type="button" class="btn btn-primary" id="all-time-expenses-btn">All Time</button>
+                            </td>
+                            <td>
                                 <button type="button" class="btn btn-primary" data-toggle="modal" id="create-expense-btn" data-target="#expense-create-modal">Create </button>
                             </td>
                         </tr>
@@ -163,6 +166,19 @@
 
         $('#yearly-expenses-btn').click(function () {
             var d = new Date();
+            d.setMonth(0);
+            d.setDate(1);
+            d.setHours(0);
+            d.setMinutes(0);
+            d.setSeconds(0);
+            d.setMilliseconds(0);
+
+            window.location.href = '/Expense?startDate=' + d.toISOString();
+        });
+
+        $('#all-time-expenses-btn').click(function () {
+            var d = new Date();
+            d.setFullYear(1);
             d.setMonth(0);
             d.setDate(1);
             d.setHours(0);

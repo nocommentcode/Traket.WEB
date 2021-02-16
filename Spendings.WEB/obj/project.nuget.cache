@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "UecXA0cqWbO3tGuiFHt3sbDIXme1Dioq0iDeDhKkR7KLFgB3lRJTdEipuKhDmFw0yZr/DDxA9JPbPfuj1ZLuTw==",
+  "dgSpecHash": "tO546tHlG5uom6XsiPXdsivRDmBrXUZf2uqpqX62AZ1n6CLR/pGiQ998ql7d8LUfCwmHJYwTHyfeuqJYv9o9DQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\Malo Hamon\\source\\repos\\Spendings.WEB\\Spendings.WEB\\Spendings.WEB.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Malo Hamon\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.10.9\\microsoft.visualstudio.azure.containers.tools.targets.1.10.9.nupkg.sha512",
-    "C:\\Users\\Malo Hamon\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512"
+    "C:\\Users\\Malo Hamon\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
+    "C:\\Users\\Malo Hamon\\.nuget\\packages\\microsoft.netcore.app.host.linux-x64\\3.1.6\\microsoft.netcore.app.host.linux-x64.3.1.6.nupkg.sha512"
   ],
   "logs": []
 }

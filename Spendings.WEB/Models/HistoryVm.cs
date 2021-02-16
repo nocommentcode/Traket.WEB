@@ -17,5 +17,7 @@ namespace Spendings.WEB.Models
         public decimal TotalExpenses { get; set; }
         public decimal TotalIncome { get; set; }
         public decimal TotalBills { get; set; }
+        public decimal TotalSavings{ get => TotalIncome - (TotalExpenses + TotalBills);}
+
     }
 }

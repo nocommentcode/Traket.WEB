@@ -25,6 +25,9 @@
                             </td>
                             <td>
                                 <button type="button" class="btn btn-primary" id="yearly-category-btn">Yearly</button>
+                            </td> 
+                            <td>
+                                <button type="button" class="btn btn-primary" id="all-time-category-btn">All Time</button>
                             </td>
                             <td>
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#category-create-modal">Create</button>
@@ -175,6 +178,19 @@
 
         $('#yearly-category-btn').click(function () {
             var d = new Date();
+            d.setMonth(0);
+            d.setDate(1);
+            d.setHours(0);
+            d.setMinutes(0);
+            d.setSeconds(0);
+            d.setMilliseconds(0);
+
+            window.location.href = '/Category?startDate=' + d.toISOString();
+        });
+
+        $('#all-time-category-btn').click(function () {
+            var d = new Date();
+            d.setFullYear(1);
             d.setMonth(0);
             d.setDate(1);
             d.setHours(0);

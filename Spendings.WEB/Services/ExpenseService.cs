@@ -56,13 +56,13 @@ namespace Spendings.WEB.Services
             return await HandleResponce(response);
         }
 
-        public async Task<ExpensesQuickInfo> GetQuickInfo(HttpContext context)
+        public async Task<List<DashboardInfo>> GetQuickInfo(HttpContext context)
         {
             var client = await _apiClientService.GetClient(context);
             var url = $"{_config.GetValue<string>("Api:Url")}/expenses/expense-quick-info";
             var response = await client.GetAsync(url);
 
-            return await HandleResponce<ExpensesQuickInfo>(response);
+            return await HandleResponce<List<DashboardInfo>>(response);
 
         }
 
@@ -156,14 +156,12 @@ namespace Spendings.WEB.Services
             return await HandleResponce<GraphVm>(response);
         }
     }
-    public class ExpensesQuickInfo
+    public class DashboardInfo
     {
-        public decimal SpendingsToday { get; set; }
-        public decimal SpendingsTodayVsLastWeek { get; set; }
-        public decimal SpendingsWTD { get; set; }
-        public decimal SpendingsWTDVsLastWeek { get; set; }
-        public decimal SpendingsMTD { get; set; }
-        public decimal SpendingsMTDVsLastMonth { get; set; }
+        public string Title { get; set; }
+        public string comparisonText { get; set; }
+        public decimal CurrentValue { get; set; }
+        public decimal ComparisonValue { get; set; }
     }
     public class GraphSeries
     {

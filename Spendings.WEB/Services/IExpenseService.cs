@@ -13,7 +13,7 @@ namespace Spendings.WEB.Services
         Task<List<Expense>> GetExpenses(HttpContext context, System.DateTime? startDate, System.DateTime? endDate);
         Task<HttpResponseMessage> UpdateExpense(HttpContext context, Expense expense);
         Task<List<string>> ImportExpenses(HttpContext httpContext, IFormFile file);
-        Task<ExpensesQuickInfo> GetQuickInfo(HttpContext context);
+        Task<List<DashboardInfo>> GetQuickInfo(HttpContext context);
         Task<GraphVm> GetGraph(HttpContext httpContext);
         Task<List<MonthlySummary>> GetMonthlySummary(HttpContext context);
     }

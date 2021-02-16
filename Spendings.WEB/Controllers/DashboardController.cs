@@ -43,6 +43,6 @@ namespace Spendings.WEB.Controllers
 
     public class DashboardVm
     {
-        public ExpensesQuickInfo QuickInfo { get; set; }
+        public List<DashboardInfo> QuickInfo { get; set; }
     }
 }
